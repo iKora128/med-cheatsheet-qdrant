@@ -1,0 +1,56 @@
+# Python関連
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# 仮想環境
+venv/
+env/
+ENV/
+.env
+.venv
+
+# キャッシュ
+.cache/
+cache/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Qdrantデータ
+qdrant_data/
+
+# テキストデータ
+data/
+
+# エディタ設定
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# ログファイル
+*.log
+
+# 一時ファイル
+tmp/
+temp/ 

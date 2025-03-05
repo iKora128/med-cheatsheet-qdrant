@@ -1,0 +1,11 @@
+version: '3.8'
+services:
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: qdrant
+    restart: always
+    ports:
+      - "6333:6333"   # REST API用ポート
+      - "6334:6334"   # gRPC API用ポート
+    volumes:
+      - ./qdrant_data:/qdrant/storage   # 永続ストレージのマウント 
