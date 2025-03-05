@@ -29,7 +29,7 @@ project-root/
 
 ## 前提条件
 
-- Python 3.8以上
+- Python 3.10以上
 - Docker と Docker Compose (Qdrantを実行するため)
 - CUDA対応GPUを推奨 (LLM実行のため)
 
@@ -57,7 +57,7 @@ uv sync
 
 4. Qdrantを起動:
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
 
 ## 使い方

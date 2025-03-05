@@ -63,7 +63,11 @@ def main():
 
     # 4. Qdrantへのデータ投入
     print(f"Qdrantに接続しています: {args.qdrant_host}:{args.qdrant_port}")
-    client = QdrantClient(host=args.qdrant_host, port=args.qdrant_port)
+    client = QdrantClient(
+        host=args.qdrant_host,
+        port=args.qdrant_port,
+        timeout=60  # タイムアウトを60秒に設定
+    )
     vector_dim = embeddings.shape[1]  # Sarashinaモデルに合わせる（例: 1792）
 
     if not client.collection_exists(args.collection_name):
@@ -75,18 +79,27 @@ def main():
     else:
         print(f"コレクション '{args.collection_name}' は既に存在します。データを追加します。")
 
-    points = []
-    for idx, (chunk, vector) in enumerate(zip(chunks, embeddings)):
-        point = PointStruct(
-            id=idx,
-            vector=vector.tolist(),
-            payload={"page": chunk["page"], "text": chunk["text"]}
-        )
-        points.append(point)
+    # バッチサイズを設定（メモリと処理時間のバランスを取る）
+    batch_size = 100
+    total_points = len(chunks)
+    
+    for start_idx in range(0, total_points, batch_size):
+        end_idx = min(start_idx + batch_size, total_points)
+        batch_points = []
+        
+        for idx in range(start_idx, end_idx):
+            point = PointStruct(
+                id=idx,
+                vector=embeddings[idx].tolist(),
+                payload={"page": chunks[idx]["page"], "text": chunks[idx]["text"]}
+            )
+            batch_points.append(point)
+        
+        print(f"バッチ {start_idx//batch_size + 1}/{(total_points + batch_size - 1)//batch_size}: "
+              f"{len(batch_points)}個のベクトルを登録中...")
+        client.upsert(collection_name=args.collection_name, points=batch_points)
 
-    print(f"{len(points)}個のベクトルをQdrantコレクション '{args.collection_name}' に登録しています...")
-    client.upsert(collection_name=args.collection_name, points=points)
-    print(f"処理完了: {len(points)}個のベクトルがQdrantに登録されました。")
+    print(f"処理完了: 合計{total_points}個のベクトルがQdrantに登録されました。")
     
     # ページコンテンツを別途保存（検索時の参照用）
     cache_dir = os.path.join(".", "cache")
